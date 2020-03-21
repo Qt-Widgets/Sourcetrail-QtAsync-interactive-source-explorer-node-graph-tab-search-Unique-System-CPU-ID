@@ -91,7 +91,7 @@ std::string getStyleSheet(const FilePath& path)
 			return "";
 		}
 
-		std::string key = seq.front();
+		const std::string key = seq.front();
 		std::string val = seq.back();
 
 		if (key == "setting")
@@ -99,37 +99,37 @@ std::string getStyleSheet(const FilePath& path)
 			if (val.find("font_size") != std::string::npos)
 			{
 				// check for modifier
-				if (val.find("+") != std::string::npos)
+				if (val.find('+') != std::string::npos)
 				{
-					int pos = val.find("+");
-					std::string sub = val.substr(pos + 1);
+					const size_t findPos = val.find('+');
+					std::string sub = val.substr(findPos + 1);
 
 					int mod = std::stoi(sub);
 
 					val = std::to_string(ApplicationSettings::getInstance()->getFontSize() + mod);
 				}
-				else if (val.find("-") != std::string::npos)
+				else if (val.find('-') != std::string::npos)
 				{
-					int pos = val.find("-");
-					std::string sub = val.substr(pos + 1);
+					const size_t findPos = val.find('-');
+					std::string sub = val.substr(findPos + 1);
 
 					int mod = std::stoi(sub);
 
 					val = std::to_string(ApplicationSettings::getInstance()->getFontSize() - mod);
 				}
-				else if (val.find("*") != std::string::npos)
+				else if (val.find('*') != std::string::npos)
 				{
-					int pos = val.find("*");
-					std::string sub = val.substr(pos + 1);
+					const size_t findPos = val.find('*');
+					std::string sub = val.substr(findPos + 1);
 
 					int mod = std::stoi(sub);
 
 					val = std::to_string(ApplicationSettings::getInstance()->getFontSize() * mod);
 				}
-				else if (val.find("/") != std::string::npos)
+				else if (val.find('/') != std::string::npos)
 				{
-					int pos = val.find("/");
-					std::string sub = val.substr(pos + 1);
+					const size_t findPos = val.find('/');
+					std::string sub = val.substr(findPos + 1);
 
 					int mod = std::stoi(sub);
 
@@ -151,7 +151,7 @@ std::string getStyleSheet(const FilePath& path)
 				size_t index = 0;
 				while (true)
 				{
-					index = val.find("\\", index);
+					index = val.find('\\', index);
 					if (index == std::string::npos)
 					{
 						break;
@@ -168,6 +168,12 @@ std::string getStyleSheet(const FilePath& path)
 		}
 		else if (key == "color")
 		{
+			if (!ColorScheme::getInstance()->hasColor(val))
+			{
+				LOG_WARNING(
+					"Color scheme does not provide value for key \"" + val +
+					"\" requested by style \"" + path.str() + "\".");
+			}
 			val = ColorScheme::getInstance()->getColor(val);
 		}
 		else if (key == "platform_wml")
@@ -246,7 +252,7 @@ QtMainWindow* getMainWindowforMainView(ViewLayout* viewLayout)
 	return nullptr;
 }
 
-void copyNewFilesFromDirectory(QString src, QString dst)
+void copyNewFilesFromDirectory(const QString& src, const QString& dst)
 {
 	QDir dir(src);
 	if (!dir.exists())

@@ -272,7 +272,7 @@ void Project::load(std::shared_ptr<DialogView> dialogView)
 	}
 }
 
-void Project::refresh(RefreshMode refreshMode, std::shared_ptr<DialogView> dialogView)
+void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested)
 {
 	if (m_refreshStage != RefreshStageType::NONE)
 	{
@@ -399,8 +399,7 @@ void Project::refresh(RefreshMode refreshMode, std::shared_ptr<DialogView> dialo
 		}
 	}
 
-	const bool useShallowIndexing = allowsShallowIndexing &&
-		(!isLoaded() || m_state == PROJECT_STATE_EMPTY);
+	const bool useShallowIndexing = allowsShallowIndexing && shallowIndexingRequested;
 
 	if (m_hasGUI)
 	{
@@ -422,7 +421,9 @@ void Project::refresh(RefreshMode refreshMode, std::shared_ptr<DialogView> dialo
 	}
 	else
 	{
-		buildIndex(getRefreshInfo(refreshMode), dialogView);
+		RefreshInfo info = getRefreshInfo(refreshMode);
+		info.shallow = useShallowIndexing;
+		buildIndex(info, dialogView);
 	}
 }
 
@@ -598,7 +599,8 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
 	size_t sourceFileCount = indexerCommandProvider->size() + customIndexerCommandProvider->size();
 
 	taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("shallow_indexing", info.shallow));
-	taskSequential->addTask(std::make_shared<TaskSetValue<int>>("source_file_count", sourceFileCount));
+	taskSequential->addTask(std::make_shared<TaskSetValue<int>>(
+		"source_file_count", static_cast<int>(sourceFileCount)));
 	taskSequential->addTask(std::make_shared<TaskSetValue<int>>("indexed_source_file_count", 0));
 	taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("interrupted_indexing", false));
 	taskSequential->addTask(std::make_shared<TaskSetValue<float>>("index_time", 0.0f));
@@ -616,7 +618,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
 	if (!indexerCommandProvider->empty())
 	{
 		const int adjustedIndexerThreadCount = std::min<int>(
-			indexerThreadCount, indexerCommandProvider->size());
+			indexerThreadCount, static_cast<int>(indexerCommandProvider->size()));
 
 		std::shared_ptr<StorageProvider> storageProvider = std::make_shared<StorageProvider>();
 		// add tasks for setting some variables on the blackboard that are used during indexing
@@ -718,7 +720,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
 	if (!customIndexerCommandProvider->empty())
 	{
 		const int adjustedIndexerThreadCount = std::min<int>(
-			indexerThreadCount, customIndexerCommandProvider->size());
+			indexerThreadCount, static_cast<int>(customIndexerCommandProvider->size()));
 
 		taskSequential->addTask(std::make_shared<TaskExecuteCustomCommands>(
 			std::move(customIndexerCommandProvider),
@@ -812,7 +814,7 @@ bool Project::swapToTempStorageFile(
 		FileSystem::remove(indexDbFilePath);
 		FileSystem::rename(tempIndexDbFilePath, indexDbFilePath);
 	}
-	catch (std::exception& e)
+	catch (std::exception& /*e*/)
 	{
 		if (m_hasGUI)
 		{

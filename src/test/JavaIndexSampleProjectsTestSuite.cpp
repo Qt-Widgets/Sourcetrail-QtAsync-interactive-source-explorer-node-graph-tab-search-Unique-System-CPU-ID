@@ -70,7 +70,7 @@ std::shared_ptr<TextAccess> parseCode(
 	JavaParser parser(
 		std::make_shared<ParserClientImpl>(&storage), std::make_shared<IndexerStateInfo>());
 	std::shared_ptr<IndexerCommandJava> command = std::make_shared<IndexerCommandJava>(
-		sourceFilePath, L"8", classpath);
+		sourceFilePath, L"12", classpath);
 
 	TimeStamp startTime = TimeStamp::now();
 	parser.buildIndex(command);
@@ -114,7 +114,7 @@ void processSourceFile(
 			expectedOutput->getLineCount() == output->getLineCount());
 		if (expectedOutput->getLineCount() == output->getLineCount())
 		{
-			for (size_t i = 1; i <= expectedOutput->getLineCount(); i++)
+			for (unsigned int i = 1; i <= expectedOutput->getLineCount(); i++)
 			{
 				REQUIRE(expectedOutput->getLine(i) == output->getLine(i));
 			}

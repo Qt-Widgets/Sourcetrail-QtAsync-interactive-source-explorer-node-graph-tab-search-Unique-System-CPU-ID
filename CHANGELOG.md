@@ -1,5 +1,46 @@
 ### Changelog
 
+#### 2020.1.106-beta
+released 2019-03-02
+
+* Make content of help dialogs selectable (issue [#805](https://github.com/CoatiSoftware/Sourcetrail/issues/935))
+* Added keyboard controls to move and activate focus in graph and code views using WASD/HJKL/Arrows + Enter/E ([#935](https://github.com/CoatiSoftware/Sourcetrail/issues/935)) (issues [#486](https://github.com/CoatiSoftware/Sourcetrail/issues/486), [#327](https://github.com/CoatiSoftware/Sourcetrail/issues/327), [#214](https://github.com/CoatiSoftware/Sourcetrail/issues/214), [#210](https://github.com/CoatiSoftware/Sourcetrail/issues/210))
+* Fixed a crash in shared memory use ([#912](https://github.com/CoatiSoftware/Sourcetrail/issues/912))
+* Discard non-existing paths in automatic path detection ([#930](https://github.com/CoatiSoftware/Sourcetrail/issues/930))
+* Python: Update python indexer to use jedi 0.16.0 ([#929](https://github.com/CoatiSoftware/Sourcetrail/issues/929))
+* Fixed frequent deadlock after loading project from Start Screen (issue [#924](https://github.com/CoatiSoftware/Sourcetrail/issues/924))
+* C/C++: Updated LLVM/Clang config headers to release 9.0.0 ([#922](https://github.com/CoatiSoftware/Sourcetrail/issues/922))
+* Fix crash in update check on premature Qt object deletion ([#920](https://github.com/CoatiSoftware/Sourcetrail/issues/920))
+* C/C++: Fixed an indexer crash ([#911](https://github.com/CoatiSoftware/Sourcetrail/issues/911))
+* Code: fixed font size not changed in single file view (issue [#916](https://github.com/CoatiSoftware/Sourcetrail/issues/916))
+* Mark required contents with asterisk in Source Group setup (issue [#723](https://github.com/CoatiSoftware/Sourcetrail/issues/723)) ([#914](https://github.com/CoatiSoftware/Sourcetrail/issues/914))
+* Removed multiple dialog steps in Source Group setup (issue [#723](https://github.com/CoatiSoftware/Sourcetrail/issues/723)) ([#913](https://github.com/CoatiSoftware/Sourcetrail/issues/913))
+* Handled non-writeable project location (issue [#735](https://github.com/CoatiSoftware/Sourcetrail/issues/735)) ([#906](https://github.com/CoatiSoftware/Sourcetrail/issues/906))
+* Fixed error help dialog not showing up during indexing (issue [#740](https://github.com/CoatiSoftware/Sourcetrail/issues/740)) ([#904](https://github.com/CoatiSoftware/Sourcetrail/issues/904))
+* Allow changing the log file path in preferences (issue [#156](https://github.com/CoatiSoftware/Sourcetrail/issues/156)) ([#900](https://github.com/CoatiSoftware/Sourcetrail/issues/900))
+* Fix crash when project directory contains non-latin character (issue [#899](https://github.com/CoatiSoftware/Sourcetrail/issues/899)) ([#901](https://github.com/CoatiSoftware/Sourcetrail/issues/901))
+* Graph: Fixed endless recursion on cyclic inheritance edges
+* Add 'close tabs to the right' context menu action to tab bar (issue [#822](https://github.com/CoatiSoftware/Sourcetrail/issues/822)) ([#875](https://github.com/CoatiSoftware/Sourcetrail/issues/875))
+* C/C++: Record calls to cxx destructor on delete keyword (issue [#829](https://github.com/CoatiSoftware/Sourcetrail/issues/829)) ([#863](https://github.com/CoatiSoftware/Sourcetrail/issues/863))
+* Retry pre-filling mandatory empty path settings on startup ([#864](https://github.com/CoatiSoftware/Sourcetrail/issues/864))
+* Improved handling of unloadable source group ([#862](https://github.com/CoatiSoftware/Sourcetrail/issues/862))
+
+#### 2019.4.102
+released 2019-12-20
+
+* C/C++: Update selectable C and C++ language standards and cross-compilation flags ([#835](https://github.com/CoatiSoftware/Sourcetrail/issues/835))
+* Java: Allow to specify custom Maven settings.xml file in project settings ([#794](https://github.com/CoatiSoftware/Sourcetrail/issues/794))
+* Python: Accept python.exe located in the root directory of the environment ([#771](https://github.com/CoatiSoftware/Sourcetrail/issues/771))
+* Java: Extend language support to Java 12 ([#752](https://github.com/CoatiSoftware/Sourcetrail/issues/752))
+* Graph: Show active symbol definition in code when clicking on active node ([#836](https://github.com/CoatiSoftware/Sourcetrail/issues/836))
+* C++: Fix recording template parameter as local symbol instead of qualifier ([#824](https://github.com/CoatiSoftware/Sourcetrail/issues/826))
+* Python: Always perform deep index as default and added '--shallow' command line option ([#823](https://github.com/CoatiSoftware/Sourcetrail/issues/823))
+* Code: Drag and drop selected source code from code view into other applications ([#707](https://github.com/CoatiSoftware/Sourcetrail/issues/707))
+* Python: Allow using "unsafe" Python environment if explicitly specified by user ([#697](https://github.com/CoatiSoftware/Sourcetrail/issues/697), [#747](https://github.com/CoatiSoftware/Sourcetrail/issues/747))
+* C/C++: Updated to LLVM/Clang 9.0.0 ([#799](https://github.com/CoatiSoftware/Sourcetrail/issues/799))
+* Fix crash on application exit ([#789](https://github.com/CoatiSoftware/Sourcetrail/issues/789))
+* Code: Fixed view cleared in single file mode when ui refresh is triggered ([#772](https://github.com/CoatiSoftware/Sourcetrail/issues/772))
+
 #### 2019.4.61
 released 2019-11-18
 

@@ -30,6 +30,7 @@
 #include "tracing.h"
 #include "utilityString.h"
 #include "utilityUuid.h"
+#include "FileLogger.h"
 
 std::shared_ptr<Application> Application::s_instance;
 std::string Application::s_uuid;
@@ -112,6 +113,13 @@ void Application::loadSettings()
 	settings->load(UserPaths::getAppSettingsPath());
 
 	LogManager::getInstance()->setLoggingEnabled(settings->getLoggingEnabled());
+	Logger* logger = LogManager::getInstance()->getLoggerByType("FileLogger");
+	if (logger)
+	{
+		const auto fileLogger = dynamic_cast<FileLogger*>(logger);
+		fileLogger->setLogDirectory(settings->getLogDirectoryPath());
+		fileLogger->setFileName(FileLogger::generateDatedFileName(L"log"));
+	}
 
 	loadStyle(settings->getColorSchemePath());
 }
@@ -255,7 +263,7 @@ void Application::handleMessage(MessageLoadProject* message)
 		if (message->settingsChanged && m_hasGUI)
 		{
 			m_project->setStateOutdated();
-			refreshProject(REFRESH_ALL_FILES);
+			refreshProject(REFRESH_ALL_FILES, message->shallowIndexingRequested);
 		}
 	}
 	else
@@ -316,7 +324,7 @@ void Application::handleMessage(MessageLoadProject* message)
 
 		if (message->refreshMode != REFRESH_NONE)
 		{
-			refreshProject(message->refreshMode);
+			refreshProject(message->refreshMode, message->shallowIndexingRequested);
 		}
 	}
 }
@@ -325,7 +333,8 @@ void Application::handleMessage(MessageRefresh* message)
 {
 	TRACE("app refresh");
 
-	refreshProject(message->all ? REFRESH_ALL_FILES : REFRESH_UPDATED_FILES);
+	refreshProject(
+		message->all ? REFRESH_ALL_FILES : REFRESH_UPDATED_FILES, false);
 }
 
 void Application::handleMessage(MessageRefreshUI* message)
@@ -342,6 +351,8 @@ void Application::handleMessage(MessageRefreshUI* message)
 		}
 
 		m_mainView->refreshViews();
+
+		m_mainView->refreshUIState(message->isAfterIndexing);
 	}
 }
 
@@ -409,11 +420,11 @@ void Application::loadWindow(bool showStartWindow)
 	}
 }
 
-void Application::refreshProject(RefreshMode refreshMode)
+void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRequested)
 {
 	if (m_project && checkSharedMemory())
 	{
-		m_project->refresh(refreshMode, getDialogView(DialogView::UseCase::INDEXING));
+		m_project->refresh(getDialogView(DialogView::UseCase::INDEXING), refreshMode, shallowIndexingRequested);
 
 		if (!m_hasGUI && !m_project->isIndexing())
 		{
@@ -439,7 +450,7 @@ void Application::updateRecentProjects(const FilePath& projectSettingsFilePath)
 		}
 
 		recentProjects.insert(recentProjects.begin(), projectSettingsFilePath);
-		while (recentProjects.size() > appSettings->getMaxRecentProjectsCount())
+		while (static_cast<int>(recentProjects.size()) > appSettings->getMaxRecentProjectsCount())
 		{
 			recentProjects.pop_back();
 		}
