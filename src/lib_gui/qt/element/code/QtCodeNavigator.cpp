@@ -562,10 +562,7 @@ void QtCodeNavigator::activateScreenMatch(size_t matchIndex)
 
 	scrollTo(
 		CodeScrollParams::toReference(
-			p.first->getFilePath(),
-			m_activeScreenMatchId,
-			0,
-			CodeScrollParams::Target::CENTER),
+			p.first->getFilePath(), m_activeScreenMatchId, 0, CodeScrollParams::Target::CENTER),
 		true,
 		true);
 }
@@ -619,15 +616,24 @@ void QtCodeNavigator::scrollTo(const CodeScrollParams& params, bool animated, bo
 	case CodeScrollParams::Type::TO_REFERENCE:
 		func = [=]() {
 			m_current->scrollTo(
-				params.filePath, 0, params.locationId, params.scopeLocationId, animated, params.target, focusTarget);
+				params.filePath,
+				0,
+				params.locationId,
+				params.scopeLocationId,
+				animated,
+				params.target,
+				focusTarget);
 		};
 		break;
 	case CodeScrollParams::Type::TO_FILE:
-		func = [=]() { m_current->scrollTo(params.filePath, 0, 0, 0, animated, params.target, focusTarget); };
+		func = [=]() {
+			m_current->scrollTo(params.filePath, 0, 0, 0, animated, params.target, focusTarget);
+		};
 		break;
 	case CodeScrollParams::Type::TO_LINE:
 		func = [=]() {
-			m_current->scrollTo(params.filePath, params.line, 0, 0, animated, params.target, focusTarget);
+			m_current->scrollTo(
+				params.filePath, params.line, 0, 0, animated, params.target, focusTarget);
 		};
 		break;
 	case CodeScrollParams::Type::TO_VALUE:
@@ -664,15 +670,26 @@ void QtCodeNavigator::scrollToFocus()
 
 	if (focus.file)
 	{
-		scrollTo(CodeScrollParams::toFile(focus.file->getFilePath(), CodeScrollParams::Target::VISIBLE), true, false);
+		scrollTo(
+			CodeScrollParams::toFile(focus.file->getFilePath(), CodeScrollParams::Target::VISIBLE),
+			true,
+			false);
 	}
 	else if (focus.scopeLine)
 	{
-		scrollTo(CodeScrollParams::toLine(focus.area->getFilePath(), focus.lineNumber, CodeScrollParams::Target::VISIBLE), true, false);
+		scrollTo(
+			CodeScrollParams::toLine(
+				focus.area->getFilePath(), focus.lineNumber, CodeScrollParams::Target::VISIBLE),
+			true,
+			false);
 	}
 	else if (focus.locationId)
 	{
-		scrollTo(CodeScrollParams::toReference(focus.area->getFilePath(), focus.locationId, 0, CodeScrollParams::Target::VISIBLE), true, false);
+		scrollTo(
+			CodeScrollParams::toReference(
+				focus.area->getFilePath(), focus.locationId, 0, CodeScrollParams::Target::VISIBLE),
+			true,
+			false);
 	}
 }
 
@@ -709,9 +726,12 @@ void QtCodeNavigator::keyPressEvent(QKeyEvent* event)
 			if (shift)
 			{
 				MessageToNextCodeReference(
-					currentFilePath, currentFocus.lineNumber, currentFocus.columnNumber,
-					direction == CodeFocusHandler::Direction::DOWN || direction == CodeFocusHandler::Direction::RIGHT
-				).dispatch();
+					currentFilePath,
+					currentFocus.lineNumber,
+					currentFocus.columnNumber,
+					direction == CodeFocusHandler::Direction::DOWN ||
+						direction == CodeFocusHandler::Direction::RIGHT)
+					.dispatch();
 			}
 			else
 			{
@@ -721,27 +741,74 @@ void QtCodeNavigator::keyPressEvent(QKeyEvent* event)
 		}
 	};
 
+	auto moveView = [=](CodeFocusHandler::Direction direction) {
+		if (!alt && !shift && ctrl)
+		{
+			QAbstractScrollArea* scrollArea = currentFocus.area;
+			int step = currentFocus.area ? currentFocus.area->lineHeight() * 3 : 50;
+			if (direction == CodeFocusHandler::Direction::DOWN ||
+				direction == CodeFocusHandler::Direction::UP)
+			{
+				if (m_mode == MODE_LIST)
+				{
+					scrollArea = m_list->getScrollArea();
+				}
+				else
+				{
+					step = 3;
+				}
+			}
+
+			if (scrollArea)
+			{
+				QScrollBar* horizontalScrollBar = scrollArea->horizontalScrollBar();
+				QScrollBar* verticalScrollBar = scrollArea->verticalScrollBar();
+
+				if (direction == CodeFocusHandler::Direction::DOWN)
+				{
+					verticalScrollBar->setValue(verticalScrollBar->value() + step);
+				}
+				else if (direction == CodeFocusHandler::Direction::UP)
+				{
+					verticalScrollBar->setValue(verticalScrollBar->value() - step);
+				}
+				else if (direction == CodeFocusHandler::Direction::RIGHT)
+				{
+					horizontalScrollBar->setValue(horizontalScrollBar->value() + step);
+				}
+				else if (direction == CodeFocusHandler::Direction::LEFT)
+				{
+					horizontalScrollBar->setValue(horizontalScrollBar->value() - step);
+				}
+			}
+		}
+	};
+
 	switch (event->key())
 	{
 	case Qt::Key_Up:
+		moveView(CodeFocusHandler::Direction::UP);
 	case Qt::Key_K:
 	case Qt::Key_W:
 		moveFocus(CodeFocusHandler::Direction::UP);
 		break;
 
 	case Qt::Key_Down:
+		moveView(CodeFocusHandler::Direction::DOWN);
 	case Qt::Key_J:
 	case Qt::Key_S:
 		moveFocus(CodeFocusHandler::Direction::DOWN);
 		break;
 
 	case Qt::Key_Left:
+		moveView(CodeFocusHandler::Direction::LEFT);
 	case Qt::Key_H:
 	case Qt::Key_A:
 		moveFocus(CodeFocusHandler::Direction::LEFT);
 		break;
 
 	case Qt::Key_Right:
+		moveView(CodeFocusHandler::Direction::RIGHT);
 	case Qt::Key_L:
 	case Qt::Key_D:
 		moveFocus(CodeFocusHandler::Direction::RIGHT);
@@ -782,6 +849,13 @@ void QtCodeNavigator::keyPressEvent(QKeyEvent* event)
 			{
 				MessageHistoryUndo().dispatch();
 			}
+		}
+		break;
+
+	case Qt::Key_C:
+		if (ctrl && !alt && !shift)
+		{
+			m_current->copySelection();
 		}
 		break;
 

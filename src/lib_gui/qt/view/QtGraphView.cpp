@@ -67,8 +67,8 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
 
 	connect(view, &QtGraphicsView::emptySpaceClicked, this, &QtGraphView::clickedInEmptySpace);
 	connect(view, &QtGraphicsView::resized, this, &QtGraphView::resized);
-	connect(view, &QtGraphicsView::focusIn, [this](){ setNavigationFocus(true); });
-	connect(view, &QtGraphicsView::focusOut, [this](){ setNavigationFocus(false); });
+	connect(view, &QtGraphicsView::focusIn, [this]() { setNavigationFocus(true); });
+	connect(view, &QtGraphicsView::focusOut, [this]() { setNavigationFocus(false); });
 
 	m_scrollSpeedChangeListenerHorizontal.setScrollBar(view->horizontalScrollBar());
 	m_scrollSpeedChangeListenerVertical.setScrollBar(view->verticalScrollBar());
@@ -323,7 +323,7 @@ void QtGraphView::rebuildGraph(
 	const GraphParams params)
 {
 	m_onQtThread([=]() {
-		if (m_transition && m_transition->currentTime() < m_transition->totalDuration())
+		if (isTransitioning())
 		{
 			m_transition->stop();
 			m_transition.reset();
@@ -383,6 +383,7 @@ void QtGraphView::rebuildGraph(
 		}
 
 		m_edges.clear();
+		QtGraphEdge::clearFocusedEdges();
 
 		// create edges
 		Graph::TrailMode trailMode = m_graph ? m_graph->getTrailMode() : Graph::TRAIL_NONE;
@@ -414,9 +415,13 @@ void QtGraphView::rebuildGraph(
 		{
 			m_focusHandler.focusTokenId(m_nodes, m_edges, params.tokenIdToFocus);
 		}
-		else
+		else if (hasNavigationFocus())
 		{
 			m_focusHandler.refocusNode(m_nodes, oldActiveTokenId, newActiveTokenId);
+		}
+		else
+		{
+			m_focusHandler.clear();
 		}
 
 		m_centerActiveNode = params.centerActiveNode;
@@ -554,7 +559,7 @@ void QtGraphView::scrollToValues(int xValue, int yValue)
 void QtGraphView::activateEdge(Id edgeId)
 {
 	m_onQtThread([=]() {
-		if (m_transition && m_transition->currentTime() < m_transition->totalDuration())
+		if (isTransitioning())
 		{
 			m_transition->stop();
 			m_transition.reset();
@@ -577,26 +582,18 @@ void QtGraphView::activateEdge(Id edgeId)
 	});
 }
 
-void QtGraphView::setNavigationFocus(bool focus)
+void QtGraphView::setNavigationFocus(bool focusIn)
 {
-	if (m_hasFocus == focus)
+	if (m_hasFocus == focusIn)
 	{
 		return;
 	}
 
-	m_hasFocus = focus;
+	m_hasFocus = focusIn;
 
-	m_onQtThread([this, focus]() {
-		focusView(focus);
-
-		if (focus)
-		{
-			m_focusHandler.focus();
-		}
-		else
-		{
-			m_focusHandler.defocus();
-		}
+	m_onQtThread([this, focusIn]() {
+		focusView(focusIn);
+		m_focusHandler.focus(focusIn);
 	});
 }
 
@@ -625,11 +622,21 @@ void QtGraphView::focusView(bool focusIn)
 
 const std::list<QtGraphNode*>& QtGraphView::getGraphNodes() const
 {
+	if (isTransitioning())
+	{
+		return m_nodes;
+	}
+
 	return m_oldNodes;
 }
 
 const std::list<QtGraphEdge*>& QtGraphView::getGraphEdges() const
 {
+	if (isTransitioning())
+	{
+		return m_edges;
+	}
+
 	return m_oldEdges;
 }
 
@@ -741,7 +748,7 @@ void QtGraphView::scrolled(int)
 
 void QtGraphView::resized()
 {
-	if (m_transition && m_transition->currentTime() < m_transition->totalDuration())
+	if (isTransitioning())
 	{
 		return;
 	}
@@ -1041,7 +1048,8 @@ QtGraphNode* QtGraphView::createNodeRecursive(
 	}
 	else if (node->isExpandToggleNode())
 	{
-		newNode = new QtGraphNodeExpandToggle(node->isExpanded(), static_cast<int>(node->invisibleSubNodeCount));
+		newNode = new QtGraphNodeExpandToggle(
+			node->isExpanded(), static_cast<int>(node->invisibleSubNodeCount));
 	}
 	else if (node->isBundleNode())
 	{
@@ -1464,4 +1472,9 @@ void QtGraphView::createTransition()
 	connect(
 		m_transition.get(), &QPropertyAnimation::finished, this, &QtGraphView::finishedTransition);
 	m_transition->start();
+}
+
+bool QtGraphView::isTransitioning() const
+{
+	return m_transition && m_transition->currentTime() < m_transition->totalDuration();
 }

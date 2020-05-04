@@ -89,6 +89,7 @@ void CodeController::handleMessage(MessageActivateLocalSymbols* message)
 	m_codeParams.activeLocalSymbolIds = message->symbolIds;
 	m_codeParams.activeLocalSymbolType = LOCATION_LOCAL_SYMBOL;
 	m_codeParams.currentActiveLocalLocationIds.clear();
+	m_codeParams.locationIdToFocus = 0;
 	showFiles(m_codeParams, CodeScrollParams(), !message->isReplayed());
 }
 
@@ -576,10 +577,15 @@ void CodeController::handleMessage(MessageToNextCodeReference* message)
 			}
 			else if (referenceFileIndex == 0)
 			{
-				if (m_references[referenceIndex].lineNumber == m_localReferences[localReferenceIndex].lineNumber)
+				if (m_references[referenceIndex].lineNumber ==
+					m_localReferences[localReferenceIndex].lineNumber)
 				{
-					if ((next && m_references[referenceIndex].columnNumber < m_localReferences[localReferenceIndex].columnNumber) ||
-						(!next && m_references[referenceIndex].columnNumber > m_localReferences[localReferenceIndex].columnNumber))
+					if ((next &&
+						 m_references[referenceIndex].columnNumber <
+							 m_localReferences[localReferenceIndex].columnNumber) ||
+						(!next &&
+						 m_references[referenceIndex].columnNumber >
+							 m_localReferences[localReferenceIndex].columnNumber))
 					{
 						localReferenceIndex = -1;
 					}
@@ -590,8 +596,12 @@ void CodeController::handleMessage(MessageToNextCodeReference* message)
 				}
 				else
 				{
-					if ((next && m_references[referenceIndex].lineNumber < m_localReferences[localReferenceIndex].lineNumber) ||
-						(!next && m_references[referenceIndex].lineNumber > m_localReferences[localReferenceIndex].lineNumber))
+					if ((next &&
+						 m_references[referenceIndex].lineNumber <
+							 m_localReferences[localReferenceIndex].lineNumber) ||
+						(!next &&
+						 m_references[referenceIndex].lineNumber >
+							 m_localReferences[localReferenceIndex].lineNumber))
 					{
 						localReferenceIndex = -1;
 					}
@@ -913,6 +923,7 @@ std::vector<std::string> CodeController::getProjectDescription(SourceLocationFil
 	std::vector<std::string> lines = utility::splitToVector(description, "\\n");
 	size_t startLineNumber = 2;
 
+	Id locationId = 0;
 	for (size_t i = 0; i < lines.size(); i++)
 	{
 		std::string line = "\t" + utility::trim(lines[i]);
@@ -943,7 +954,7 @@ std::vector<std::string> CodeController::getProjectDescription(SourceLocationFil
 				line.replace(posA, posB - posA + 1, nameString);
 				locationFile->addSourceLocation(
 					LOCATION_TOKEN,
-					0,
+					++locationId,
 					{tokenId},
 					startLineNumber + i,
 					posA + 1,
@@ -1198,7 +1209,8 @@ std::pair<int, int> CodeController::findClosestReferenceIndex(
 			if (!next)
 			{
 				if (references[i].lineNumber < currentLineNumber ||
-					(references[i].lineNumber == currentLineNumber && references[i].columnNumber < currentColumnNumber))
+					(references[i].lineNumber == currentLineNumber &&
+					 references[i].columnNumber < currentColumnNumber))
 				{
 					referenceIndex = static_cast<int>(i);
 				}
@@ -1207,8 +1219,10 @@ std::pair<int, int> CodeController::findClosestReferenceIndex(
 					return {referenceIndex, beforeCurrentFile ? -1 : 0};
 				}
 			}
-			else if (references[i].lineNumber > currentLineNumber ||
-					(references[i].lineNumber == currentLineNumber && references[i].columnNumber > currentColumnNumber))
+			else if (
+				references[i].lineNumber > currentLineNumber ||
+				(references[i].lineNumber == currentLineNumber &&
+				 references[i].columnNumber > currentColumnNumber))
 			{
 				return {static_cast<int>(i), 0};
 			}

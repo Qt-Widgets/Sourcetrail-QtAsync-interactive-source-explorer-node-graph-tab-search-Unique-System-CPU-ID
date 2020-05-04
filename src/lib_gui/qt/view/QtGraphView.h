@@ -68,7 +68,7 @@ public:
 
 	void activateEdge(Id edgeId) override;
 
-	void setNavigationFocus(bool focus) override;
+	void setNavigationFocus(bool focusIn) override;
 	bool hasNavigationFocus() const override;
 
 	// GraphFocusClient implementation
@@ -144,6 +144,7 @@ private:
 		std::vector<std::pair<QtGraphNode*, QtGraphNode*>>* remainingNodes);
 
 	void createTransition();
+	bool isTransitioning() const;
 
 	GraphFocusHandler m_focusHandler;
 	bool m_hasFocus = false;

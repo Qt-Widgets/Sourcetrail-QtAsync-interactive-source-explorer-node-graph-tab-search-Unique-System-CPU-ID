@@ -217,8 +217,14 @@ void QtCodeFileSingle::scrollTo(
 
 	if (focusTarget && locationId)
 	{
-		m_navigator->setFocusedLocationId(m_area, lineNumber, m_area->getColumnNumberForLocationId(locationId),
-			locationId, {}, false, false);
+		m_navigator->setFocusedLocationId(
+			m_area,
+			lineNumber,
+			m_area->getColumnNumberForLocationId(locationId),
+			locationId,
+			{},
+			false,
+			false);
 	}
 }
 
@@ -258,6 +264,14 @@ void QtCodeFileSingle::moveFocus(
 	if (m_area == focus.area)
 	{
 		focus.area->moveFocus(direction, focus.lineNumber, focus.locationId);
+	}
+}
+
+void QtCodeFileSingle::copySelection()
+{
+	if (m_area)
+	{
+		m_area->copySelection();
 	}
 }
 

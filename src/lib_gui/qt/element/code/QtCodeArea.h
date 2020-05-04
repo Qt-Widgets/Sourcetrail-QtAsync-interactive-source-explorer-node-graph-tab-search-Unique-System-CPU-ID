@@ -63,6 +63,7 @@ public:
 	void lineNumberAreaPaintEvent(QPaintEvent* event);
 	int lineNumberDigits() const;
 	int lineNumberAreaWidth() const;
+	int lineHeight() const;
 	void updateLineNumberAreaWidthForDigits(int digits);
 
 	void updateSourceLocations(std::shared_ptr<SourceLocationFile> locationFile);
@@ -93,6 +94,8 @@ public:
 	bool moveFocusToLine(int lineNumber, int targetColumn, bool up);
 	bool moveFocusInLine(size_t lineNumber, Id locationId, bool forward);
 	void activateLocationId(Id locationId, bool fromMouse);
+
+	void copySelection();
 
 protected:
 	virtual void resizeEvent(QResizeEvent* event) override;

@@ -562,7 +562,7 @@ void QtCodeField::activateAnnotations(
 	{
 		MessageActivateSourceLocations(locationIds, containsUnsolved).dispatch();
 	}
-	else if (tokenIds.size())	 // fallback for links in project description
+	else if (tokenIds.size())
 	{
 		MessageActivateTokenIds(utility::toVector(tokenIds)).dispatch();
 	}
