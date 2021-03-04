@@ -7,11 +7,11 @@ MavenPathDetectorWindows::MavenPathDetectorWindows(): PathDetector("Maven for Wi
 
 std::vector<FilePath> MavenPathDetectorWindows::doGetPaths() const
 {
-	std::string command = "cmd /c where mvn.cmd && exit";
-	FilePath mavenPath(utility::executeProcess(command.c_str()).second);
-
 	std::vector<FilePath> paths;
-	if (mavenPath.exists())
+
+	bool ok;
+	FilePath mavenPath(utility::searchPath(L"mvn.cmd", ok));
+	if (ok && !mavenPath.empty() && mavenPath.exists())
 	{
 		paths.push_back(mavenPath);
 	}

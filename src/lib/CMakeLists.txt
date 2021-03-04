@@ -147,8 +147,8 @@ add_files(
 	data/graph/token_component/TokenComponentAbstraction.h
 	data/graph/token_component/TokenComponentAccess.cpp
 	data/graph/token_component/TokenComponentAccess.h
-	data/graph/token_component/TokenComponentAggregation.cpp
-	data/graph/token_component/TokenComponentAggregation.h
+	data/graph/token_component/TokenComponentBundledEdges.cpp
+	data/graph/token_component/TokenComponentBundledEdges.h
 	data/graph/token_component/TokenComponentConst.cpp
 	data/graph/token_component/TokenComponentConst.h
 	data/graph/token_component/TokenComponentFilePath.cpp
@@ -489,6 +489,7 @@ add_files(
 	utility/messaging/type/graph/MessageGraphNodeHide.h
 	utility/messaging/type/graph/MessageGraphNodeMove.h
 	utility/messaging/type/graph/MessageScrollGraph.h
+	utility/messaging/type/graph/MessageSaveAsImage.h
 
 	utility/messaging/type/history/MessageHistoryToPosition.h
 	utility/messaging/type/history/MessageHistoryRedo.h

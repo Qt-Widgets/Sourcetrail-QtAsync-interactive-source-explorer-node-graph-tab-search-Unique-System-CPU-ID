@@ -25,12 +25,12 @@ QtCodeFileTitleBar::QtCodeFileTitleBar(QWidget* parent, bool isHovering, bool is
 	}
 
 	QHBoxLayout* titleLayout = new QHBoxLayout();
-	titleLayout->setMargin(0);
+	titleLayout->setContentsMargins(0, 0, 0, 0);
 	titleLayout->setSpacing(0);
 	titleLayout->setAlignment(Qt::AlignLeft);
 	setLayout(titleLayout);
 
-	FilePath imageDir = ResourcePaths::getGuiPath().concatenate(L"code_view/images/");
+	FilePath imageDir = ResourcePaths::getGuiDirectoryPath().concatenate(L"code_view/images/");
 
 	m_expandButton = new QtSelfRefreshIconButton(
 		QLatin1String(""),

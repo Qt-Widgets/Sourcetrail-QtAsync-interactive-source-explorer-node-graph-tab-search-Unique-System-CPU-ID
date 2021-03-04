@@ -644,7 +644,7 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style)
 	if (style.hasHatching)
 	{
 		QtDeviceScaledPixmap pattern(QString::fromStdWString(
-			ResourcePaths::getGuiPath().concatenate(L"graph_view/images/pattern.png").wstr()));
+			ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/pattern.png").wstr()));
 		pattern.scaleToHeight(12);
 		QPixmap pixmap = utility::colorizePixmap(pattern.pixmap(), style.color.hatching.c_str());
 
@@ -693,7 +693,7 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style)
 			static_cast<qreal>(style.textOffset.y));
 
 		const float charWidth =
-			QFontMetrics(font).width(QStringLiteral("QtGraphNode::QtGraphNode::QtGraphNode")) / 37.0f;
+			QFontMetrics(font).boundingRect(QStringLiteral("QtGraphNode::QtGraphNode::QtGraphNode")).width() / 37.0f;
 		const float charHeight = static_cast<float>(QFontMetrics(font).height());
 		m_matchRect->setRect(
 			static_cast<qreal>(

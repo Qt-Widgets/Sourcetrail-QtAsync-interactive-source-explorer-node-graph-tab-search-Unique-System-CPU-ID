@@ -37,7 +37,7 @@
 QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
 	: QGraphicsView(parent)
 	, m_focusHandler(focusHandler)
-	, m_zoomFactor(1.0f)
+	, m_zoomFactor(ApplicationSettings::getInstance()->getGraphZoomLevel())
 	, m_appZoomFactor(1.0f)
 	, m_zoomInButtonSpeed(20.0f)
 	, m_zoomOutButtonSpeed(-20.0f)
@@ -125,6 +125,11 @@ QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
 	m_exportGraphAction->setToolTip(QStringLiteral("Save this graph as image file"));
 	connect(m_exportGraphAction, &QAction::triggered, this, &QtGraphicsView::exportGraph);
 
+	m_copyGraphAction = new QAction(QStringLiteral("Save to Clipboard"), this);
+	m_copyGraphAction->setStatusTip(QStringLiteral("Save this graph as image to the Clipboard"));
+	m_copyGraphAction->setToolTip(QStringLiteral("Save this graph as image to the Clipboard"));
+	connect(m_copyGraphAction, &QAction::triggered, this, &QtGraphicsView::copyGraph);
+
 	m_focusIndicator = new QWidget(this);
 	m_focusIndicator->setObjectName(QStringLiteral("focus_indicator"));
 	m_focusIndicator->hide();
@@ -135,7 +140,7 @@ QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
 
 	m_zoomInButton = new QtSelfRefreshIconButton(
 		QLatin1String(""),
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/zoom_in.png"),
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/zoom_in.png"),
 		"search/button",
 		this);
 	m_zoomInButton->setObjectName(QStringLiteral("zoom_in_button"));
@@ -145,7 +150,7 @@ QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
 
 	m_zoomOutButton = new QtSelfRefreshIconButton(
 		QLatin1String(""),
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/zoom_out.png"),
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/zoom_out.png"),
 		"search/button",
 		this);
 	m_zoomOutButton->setObjectName(QStringLiteral("zoom_out_button"));
@@ -155,12 +160,14 @@ QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
 
 	m_legendButton = new QtSelfRefreshIconButton(
 		QLatin1String(""),
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/legend.png"),
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/legend.png"),
 		"search/button",
 		this);
 	m_legendButton->setObjectName(QStringLiteral("legend_button"));
 	m_legendButton->setToolTip(QStringLiteral("show legend"));
 	connect(m_legendButton, &QPushButton::clicked, this, &QtGraphicsView::legendClicked);
+
+	m_tabId = TabId::currentTab();
 }
 
 float QtGraphicsView::getZoomFactor() const
@@ -178,6 +185,8 @@ void QtGraphicsView::setSceneRect(const QRectF& rect)
 {
 	QGraphicsView::setSceneRect(rect);
 	scene()->setSceneRect(rect);
+	m_imageCached = toQImage();
+	m_tabId = TabId::currentTab();
 }
 
 QtGraphNode* QtGraphicsView::getNodeAtCursorPosition() const
@@ -468,9 +477,9 @@ void QtGraphicsView::wheelEvent(QWheelEvent* event)
 
 	if (zoomDefault != (shiftPressed | ctrlPressed))
 	{
-		if (event->delta() != 0.0f)
+		if (event->angleDelta().y() != 0.0f)
 		{
-			updateZoom(static_cast<float>(event->delta()));
+			updateZoom(static_cast<float>(event->angleDelta().y()));
 		}
 	}
 	else
@@ -582,6 +591,7 @@ void QtGraphicsView::contextMenuEvent(QContextMenuEvent* event)
 
 	menu.addSeparator();
 	menu.addAction(m_exportGraphAction);
+	menu.addAction(m_copyGraphAction);
 
 	menu.addSeparator();
 	menu.addAction(m_copyNodeNameAction);
@@ -665,6 +675,46 @@ void QtGraphicsView::openInTab()
 	MessageTabOpenWith(m_openInTabNodeId).dispatch();
 }
 
+QImage QtGraphicsView::toQImage()
+{
+	const QString exportNotice = QStringLiteral("Exported from Sourcetrail");
+	const int margin = 10;
+
+	QImage image(scene()->sceneRect().size().toSize() * 2, QImage::Format_ARGB32);
+	image.fill(Qt::transparent);
+
+	QPainter painter(&image);
+	painter.setRenderHint(QPainter::Antialiasing);
+	scene()->render(&painter);
+
+	{
+		QFont font = painter.font();
+		font.setPixelSize(14);
+		painter.setFont(font);
+	}
+	{
+		QRect boundingRect;
+		painter.drawText(
+			QRect(margin, margin, image.size().width() - 2 * margin, image.size().height() - 2 * margin),
+			Qt::AlignBottom | Qt::AlignHCenter,
+			exportNotice,
+			&boundingRect);
+
+		{
+			QFont font = painter.font();
+			font.setPixelSize(8);
+			painter.setFont(font);
+		}
+
+		painter.drawText(
+			boundingRect.right() + boundingRect.height() / 5,
+			boundingRect.top() + boundingRect.height() / 2,
+			QChar(0x00AE));
+	}
+
+	return image;
+}
+
 void QtGraphicsView::exportGraph()
 {
 	const QString exportNotice = QStringLiteral("Exported from Sourcetrail");
@@ -677,7 +727,6 @@ void QtGraphicsView::exportGraph()
 			FilePath(),
 			QStringLiteral("PNG (*.png);;JPEG (*.JPEG);;BMP Files (*.bmp);;SVG (*.svg)"))
 			.toStdWString());
-
 
 	if (filePath.extension() == L".svg")
 	{
@@ -711,40 +760,13 @@ void QtGraphicsView::exportGraph()
 	}
 	else if (!filePath.empty())
 	{
-		QImage image(scene()->sceneRect().size().toSize() * 2, QImage::Format_ARGB32);
-		image.fill(Qt::transparent);
-
-		QPainter painter(&image);
-		painter.setRenderHint(QPainter::Antialiasing);
-		scene()->render(&painter);
-
-		{
-			QFont font = painter.font();
-			font.setPixelSize(14);
-			painter.setFont(font);
-		}
-		{
-			QRect boundingRect;
-			painter.drawText(
-				QRect(margin, margin, image.size().width() - 2 * margin, image.size().height() - 2 * margin),
-				Qt::AlignBottom | Qt::AlignHCenter,
-				exportNotice,
-				&boundingRect);
-
-			{
-				QFont font = painter.font();
-				font.setPixelSize(8);
-				painter.setFont(font);
-			}
-
-			painter.drawText(
-				boundingRect.right() + boundingRect.height() / 5,
-				boundingRect.top() + boundingRect.height() / 2,
-				QChar(0x00AE));
-		}
-
-		image.save(QString::fromStdWString(filePath.wstr()));
+		toQImage().save(QString::fromStdWString(filePath.wstr()));
 	}
+}
+
+void QtGraphicsView::copyGraph()
+{
+	QApplication::clipboard()->setImage(toQImage());
 }
 
 void QtGraphicsView::copyNodeName()
@@ -816,6 +838,10 @@ void QtGraphicsView::setZoomFactor(float zoomFactor)
 {
 	m_zoomFactor = zoomFactor;
 
+	std::shared_ptr<ApplicationSettings> settings = ApplicationSettings::getInstance();
+	settings->setGraphZoomLevel(zoomFactor);
+	settings->save();
+
 	m_zoomState->setText(QString::number(int(m_zoomFactor * 100)) + "%");
 	updateTransform();
 
@@ -828,4 +854,12 @@ void QtGraphicsView::updateTransform()
 {
 	float zoomFactor = m_appZoomFactor * m_zoomFactor;
 	setTransform(QTransform(zoomFactor, 0, 0, zoomFactor, 0, 0));
+}
+
+void QtGraphicsView::handleMessage(MessageSaveAsImage* message)
+{
+	if ( (message->getSchedulerId() == getSchedulerId()) && !m_imageCached.isNull() )
+	{
+		m_imageCached.save(message->path);
+	}
 }

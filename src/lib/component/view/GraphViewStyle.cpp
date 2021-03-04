@@ -553,7 +553,7 @@ GraphViewStyle::NodeStyle GraphViewStyle::getStyleOfBundleNode(bool isFocused)
 	return getStyleForNodeType(
 		NodeType::STYLE_BIG_NODE,
 		"bundle",
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/bundle.png"),
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/bundle.png"),
 		true,
 		false,
 		isFocused,
@@ -671,7 +671,7 @@ GraphViewStyle::EdgeStyle GraphViewStyle::getStyleForEdgeType(
 
 	switch (type)
 	{
-	case Edge::EDGE_AGGREGATION:
+	case Edge::EDGE_BUNDLED_EDGES:
 		style.width = 3;
 		style.arrowLength = 7;
 		style.arrowWidth = 10;

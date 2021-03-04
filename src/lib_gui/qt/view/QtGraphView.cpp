@@ -83,7 +83,7 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
 		{
 			m_expandButton = new QtSelfRefreshIconButton(
 				QLatin1String(""),
-				ResourcePaths::getGuiPath().concatenate(L"graph_view/images/graph.png"),
+				ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/graph.png"),
 				"search/button");
 			m_expandButton->setObjectName(QStringLiteral("expand_button"));
 			m_expandButton->setToolTip(QStringLiteral("show trail controls"));
@@ -100,7 +100,7 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
 
 			m_collapseButton = new QtSelfRefreshIconButton(
 				QLatin1String(""),
-				ResourcePaths::getGuiPath().concatenate(L"graph_view/images/graph_arrow.png"),
+				ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/graph_arrow.png"),
 				"search/button",
 				ui);
 			m_collapseButton->setObjectName(QStringLiteral("collapse_button"));
@@ -114,7 +114,7 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
 			m_customTrailButton->setIconSize(QSize(16, 16));
 			m_customTrailButton->setToolTip(QStringLiteral("custom trail"));
 			m_customTrailButton->setIconPath(
-				ResourcePaths::getGuiPath().concatenate(L"graph_view/images/graph_custom.png"));
+				ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/graph_custom.png"));
 			connect(
 				m_customTrailButton, &QPushButton::clicked, this, &QtGraphView::clickedCustomTrail);
 
@@ -177,11 +177,11 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
 	{
 		m_groupFileButton = new QtSelfRefreshIconButton(
 			QLatin1String(""),
-			ResourcePaths::getGuiPath().concatenate(L"graph_view/images/file.png"),
+			ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/file.png"),
 			"search/button");
 		m_groupNamespaceButton = new QtSelfRefreshIconButton(
 			QLatin1String(""),
-			ResourcePaths::getGuiPath().concatenate(L"graph_view/images/group_namespace.png"),
+			ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/group_namespace.png"),
 			"search/button");
 
 		m_groupFileButton->setObjectName(QStringLiteral("group_right_button"));
@@ -238,7 +238,7 @@ void QtGraphView::refreshView()
 		QtGraphicsView* view = getView();
 
 		const std::string css = utility::getStyleSheet(
-			ResourcePaths::getGuiPath().concatenate(L"graph_view/graph_view.css"));
+			ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/graph_view.css"));
 		view->setStyleSheet(css.c_str());
 		view->setAppZoomFactor(GraphViewStyle::getZoomFactor());
 
@@ -390,7 +390,7 @@ void QtGraphView::rebuildGraph(
 		std::set<Id> visibleEdgeIds;
 		for (const std::shared_ptr<DummyEdge>& edge: edges)
 		{
-			if (!edge->data || !edge->data->isType(Edge::EDGE_AGGREGATION))
+			if (!edge->data || !edge->data->isType(Edge::EDGE_BUNDLED_EDGES))
 			{
 				createEdge(
 					view,
@@ -404,9 +404,9 @@ void QtGraphView::rebuildGraph(
 		}
 		for (const std::shared_ptr<DummyEdge>& edge: edges)
 		{
-			if (edge->data && edge->data->isType(Edge::EDGE_AGGREGATION))
+			if (edge->data && edge->data->isType(Edge::EDGE_BUNDLED_EDGES))
 			{
-				createAggregationEdge(view, edge.get(), &visibleEdgeIds, !params.disableInteraction);
+				createBundledEdgesEdge(view, edge.get(), &visibleEdgeIds, !params.disableInteraction);
 			}
 		}
 
@@ -930,13 +930,15 @@ void QtGraphView::updateTrailButtons()
 	}
 
 	m_forwardTrailButton->setIconPath(
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/" + forwardImagePath));
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/" + forwardImagePath));
 	m_backwardTrailButton->setIconPath(
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/" + backwardImagePath));
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/" + backwardImagePath));
 }
 
 void QtGraphView::switchToNewGraphData()
 {
+	m_focusHandler.refocusNode(m_nodes, 0, 0);
+
 	m_oldGraph = m_graph;
 
 	for (QtGraphNode* node: m_oldNodes)
@@ -1201,7 +1203,7 @@ QtGraphEdge* QtGraphView::createEdge(
 	return nullptr;
 }
 
-QtGraphEdge* QtGraphView::createAggregationEdge(
+QtGraphEdge* QtGraphView::createBundledEdgesEdge(
 	QGraphicsView* view, const DummyEdge* edge, std::set<Id>* visibleEdgeIds, bool interactive)
 {
 	if (!edge->visible)
@@ -1210,9 +1212,9 @@ QtGraphEdge* QtGraphView::createAggregationEdge(
 	}
 
 	bool allVisible = true;
-	std::set<Id> aggregationIds =
-		edge->data->getComponent<TokenComponentAggregation>()->getAggregationIds();
-	for (Id edgeId: aggregationIds)
+	std::set<Id> bundledEdgesIds =
+		edge->data->getComponent<TokenComponentBundledEdges>()->getBundledEdgesIds();
+	for (Id edgeId: bundledEdgesIds)
 	{
 		if (visibleEdgeIds->find(edgeId) == visibleEdgeIds->end())
 		{

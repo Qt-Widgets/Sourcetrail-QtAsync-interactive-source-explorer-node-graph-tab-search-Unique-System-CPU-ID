@@ -12,8 +12,8 @@ QtWindowBase::QtWindowBase(bool isSubWindow, QWidget* parent)
 	, m_isSubWindow(isSubWindow)
 	, m_window(nullptr)
 	, m_content(nullptr)
-	, m_sizeGrip(nullptr)
 	, m_mousePressedInWindow(false)
+	, m_sizeGrip(nullptr)
 {
 	if (isSubWindow)
 	{
@@ -89,7 +89,7 @@ void QtWindowBase::setSizeGripStyle(bool isBlack)
 		"	max-height: 16px;"
 		"	max-width: 16px;"
 		"	border-image: url(" +
-		ResourcePaths::getGuiPath().wstr() + L"window/" + path +
+		ResourcePaths::getGuiDirectoryPath().wstr() + L"window/" + path +
 		L");"
 		"}"));
 }

@@ -1,7 +1,50 @@
 ### Changelog
 
+#### 2020.4.35
+released 2021-01-06
+
+* Build: Add compatibility layer for Qt versions ([#1118](https://github.com/CoatiSoftware/Sourcetrail/issues/1118))
+* C/C++: Updated to LLVM/Clang 11.0.0 (issue [#1088](https://github.com/CoatiSoftware/Sourcetrail/issues/1088)) ([#1116](https://github.com/CoatiSoftware/Sourcetrail/issues/1116))
+* C/C++: fix crash when using codeblocks project (issue [#1109](https://github.com/CoatiSoftware/Sourcetrail/issues/1109)) ([#1110](https://github.com/CoatiSoftware/Sourcetrail/issues/1110))
+* Graph: add menu action for graph 'save as image' (issue [#426](https://github.com/CoatiSoftware/Sourcetrail/issues/426)) ([#1104](https://github.com/CoatiSoftware/Sourcetrail/issues/1104))
+* Graph: remember graph zoom level on restart (issue [#801](https://github.com/CoatiSoftware/Sourcetrail/issues/801)) ([#1099](https://github.com/CoatiSoftware/Sourcetrail/issues/1099))
+* Build: fix compiler issue when CMAKE_CXX_COMPILER_LAUNCHER was set to ccache (issue [#1081](https://github.com/CoatiSoftware/Sourcetrail/issues/1081)) ([#1093](https://github.com/CoatiSoftware/Sourcetrail/issues/1093))
+* Python: update python indexer to v1.db25.p5 ([#1087](https://github.com/CoatiSoftware/Sourcetrail/issues/1087))
+* Linux: explicitly add u+w permission when copying initial user data ([#1072](https://github.com/CoatiSoftware/Sourcetrail/issues/1072))
+* Linux: Fixed duplicating Sourcetrail icon on run ([#1071](https://github.com/CoatiSoftware/Sourcetrail/issues/1071))
+* Build: Qt 5.12 deprecation fixes ([#1003](https://github.com/CoatiSoftware/Sourcetrail/issues/1003))
+* Linux: Prevent word splitting within arguments passed to Sourcetrail.sh ([#1057](https://github.com/CoatiSoftware/Sourcetrail/issues/1057))
+* C/C++: Support linking with LLVM/Clang Dylib instead of individual components ([#1044](https://github.com/CoatiSoftware/Sourcetrail/issues/1044))
+
+
+#### 2020.2.43
+released 2020-06-29
+
+* Docs: Explain Linux Tarball uninstall ([#1047](https://github.com/CoatiSoftware/Sourcetrail/issues/1047))
+* Graph: Renamed 'aggregation' edge to 'bundled edges' for more clarity ([#1051](https://github.com/CoatiSoftware/Sourcetrail/issues/1051))
+* Fixed error recording for multi-threaded custom command indexing ([#1049](https://github.com/CoatiSoftware/Sourcetrail/issues/1049))
+* UI: Fixed crash when changing tabs during animation with focus on a child node ([#1046](https://github.com/CoatiSoftware/Sourcetrail/issues/1046))
+* C/C++: Improved help message for source file extensions in project settings ([#1039](https://github.com/CoatiSoftware/Sourcetrail/issues/1039))
+* Python: Updated to SourcetrailPythonIndexer v1.db25.p4 - Record override edges ([#1037](https://github.com/CoatiSoftware/Sourcetrail/issues/1037))
+* Linux: Migrated Linux '.tar.gz' package creation from CPack to linuxdeployqt ([#1034](https://github.com/CoatiSoftware/Sourcetrail/issues/1034))
+* UI: Save last filepicker location ([#802](https://github.com/CoatiSoftware/Sourcetrail/issues/802))
+* C/C++: Updated to LLVM/Clang 10.0.0 ([#965](https://github.com/CoatiSoftware/Sourcetrail/issues/965))
+* Java: Updated macOS Java Path detector and docs to current JDK file structure ([#1031](https://github.com/CoatiSoftware/Sourcetrail/issues/1031))
+* Improved performance of excluded files and directories filtering ([#1030](https://github.com/CoatiSoftware/Sourcetrail/issues/1030))
+* Fix corrupted display of non-ascii characters in about window ([#1013](https://github.com/CoatiSoftware/Sourcetrail/issues/1013))
+* C/C++: Copy Clang compiler headers from Clang build dir via CMake ([#993](https://github.com/CoatiSoftware/Sourcetrail/issues/993))
+* Improved error logging if exception occurred while loading project ([#1004](https://github.com/CoatiSoftware/Sourcetrail/issues/1004))
+* Graph: Add context menu action 'copy to clipboard' ([#999](https://github.com/CoatiSoftware/Sourcetrail/issues/999))
+* C/C++: Extend Compiler Flags help message ([#974](https://github.com/CoatiSoftware/Sourcetrail/issues/974))
+* macOS: Create .dmg release package using HFS+ filesystem to be mountable on older macOS versions ([#619](https://github.com/CoatiSoftware/Sourcetrail/issues/619))
+* Python: Respect "super()" in post processing ([#964](https://github.com/CoatiSoftware/Sourcetrail/issues/964))
+* Less restrictions for FilePath::isValid check on project location ([#959](https://github.com/CoatiSoftware/Sourcetrail/issues/959))
+* Refactored recent projects menu ([#956](https://github.com/CoatiSoftware/Sourcetrail/issues/956))
+* macOs: Updated Info.plist missing values and removed deprecated keys
+* Python: Respect class qualifier in method call for post processing ([#951](https://github.com/CoatiSoftware/Sourcetrail/issues/951))
+
 #### 2020.1.117
-released 2019-03-31
+released 2020-03-31
 
 * C/C++: Fixed multiple main declarations not shown as separate symbols when declaring file has same name ([#950](https://github.com/CoatiSoftware/Sourcetrail/issues/950))
 * Linux: Provide AppImage package based on linuxdeployqt (issue [#279](https://github.com/CoatiSoftware/Sourcetrail/issues/279)) ([#945](https://github.com/CoatiSoftware/Sourcetrail/issues/945))
@@ -183,7 +226,7 @@ released 2018-12-18
 * Fixed indexed source files not updated when clicking "show files" after other changes in project setup
 * Linux: Fixed issue in sourcetrail.sh script (issue [#638](https://github.com/CoatiSoftware/Sourcetrail/issues/638))
 * Inspect errors during indexing (issue [#235](https://github.com/CoatiSoftware/Sourcetrail/issues/235))
-* C/C++: Fixed header path selection in Source Group setup also preselects non exsiting paths (issue [#640](https://github.com/CoatiSoftware/Sourcetrail/issues/640))
+* C/C++: Fixed header path selection in Source Group setup also preselects non existing paths (issue [#640](https://github.com/CoatiSoftware/Sourcetrail/issues/640))
 * Graph: Fixed graph node centering shows right end when node has greater width than view
 * Code: Fixed multiple multiline comments within one line not correctly highlighted
 * Code: Changed snippet style, removing per file frame and minimize/snippet buttons
@@ -782,7 +825,7 @@ released 2016-12-14
 * Integrated Visual Studio Plugin with Coati Project creation and removed previous Visual Studio Solution parser
 * Improved C++ indexer coverage: using decls, using directives, auto keyword, lambda signatures, symbol references inside lambda captures, template argument related elements
 * Reduced size of .coatidb file by up to 50% for large projects
-* Fixed anonymouse symbol name conflicts (issue [#241](https://github.com/CoatiSoftware/Sourcetrail/issues/241))
+* Fixed anonymous symbol name conflicts (issue [#241](https://github.com/CoatiSoftware/Sourcetrail/issues/241))
 * Preferences: Added Indexer Logging option to print AST information during indexing
 * Search: Added second line to search autocompletion list showing namespace, package or filepath
 * Made cells readonly in errors table to prevent editing (issue [#236](https://github.com/CoatiSoftware/Sourcetrail/issues/236))
@@ -960,7 +1003,7 @@ released 2016-06-15
 * Added Qt gif plugin to Mac Release so that loader gif in status bar is visible
 * Added link to download page to start screen to remind users of updating once in a while
 * Check if compilation database still exists before refreshing
-* Added separate step for defining project name, project location and compiliation database to project setup
+* Added separate step for defining project name, project location and compilation database to project setup
 * Explain that the project stays up-to-date with the compilation databes on refresh in project setup UI
 * Disregard source extensions when loading from compilation database
 * Removed error logs in name resolver
@@ -969,7 +1012,7 @@ released 2016-06-15
 #### 0.6.0.0
 released 2016-04-27
 
-* Added suppport for temporary test licenses and show error message when it expired
+* Added support for temporary test licenses and show error message when it expired
 * Increased search autocompletion performance to stay mostly below 100ms
 * Increased project load performance
 * Improved file clearing performance on project refresh
@@ -1068,7 +1111,7 @@ released 2016-02-25
 * Fixed cursor changing for resize and text interactions
 * Added commandline option for project file
 * Improved performance of token name saving
-* Fixed number postions in graph
+* Fixed number positions in graph
 * Added shortcuts for font size resetting to View menu
 * Added C support
 * Added option to hide widget window title bars to View menu
@@ -1084,10 +1127,10 @@ released 2016-01-07
 * Improved lambda handling in analysis
 * Added help texts to project setup and preferences window
 * Removed 'close window' action from menu
-* Fixed constructors and destructors using return type 'void' withou source location
+* Fixed constructors and destructors using return type 'void' without source location
 * Parse errors will be displayed as they appear during analysis
 * Redesigned the about window
-* Installing prerequisits in Windows Installer
+* Installing prerequisites in Windows Installer
 * Added installer for Windows
 * Introduced file endings .coatiproject and .coatidb for Coati's project files
 * Removed Coati directory from Linux package

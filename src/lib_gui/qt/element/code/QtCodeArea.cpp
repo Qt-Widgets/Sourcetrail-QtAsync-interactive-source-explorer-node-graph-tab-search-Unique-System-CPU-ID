@@ -28,6 +28,7 @@
 #include "QtContextMenu.h"
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
+#include "compatibilityQt.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityString.h"
@@ -40,7 +41,8 @@ bool MouseWheelOverScrollbarFilter::eventFilter(QObject* obj, QEvent* event)
 	if (event->type() == QEvent::Wheel && scrollbar)
 	{
 		QRect scrollbarArea(scrollbar->pos(), scrollbar->size());
-		QPoint globalMousePos = dynamic_cast<QWheelEvent*>(event)->globalPos();
+		QPoint globalMousePos = utility::compatibility::QWheelEvent_globalPos(
+			*dynamic_cast<QWheelEvent*>(event));
 		QPoint localMousePos = scrollbar->mapFromGlobal(globalMousePos);
 
 		// instead of "scrollbar->underMouse()" we need this check implemented here because
@@ -294,7 +296,7 @@ int QtCodeArea::lineNumberAreaWidth() const
 {
 	if (m_showLineNumbers)
 	{
-		return fontMetrics().width(QLatin1Char('9')) * m_digits + 30;
+		return fontMetrics().boundingRect(QLatin1Char('9')).width() * m_digits + 30;
 	}
 
 	return 0;
@@ -643,7 +645,8 @@ bool QtCodeArea::moveFocusToLine(int lineNumber, int targetColumn, bool up)
 {
 	while (true)
 	{
-		if (lineNumber < getStartLineNumber() || lineNumber > getEndLineNumber())
+		if (static_cast<size_t>(lineNumber) < getStartLineNumber() ||
+			static_cast<size_t>(lineNumber) > getEndLineNumber())
 		{
 			break;
 		}

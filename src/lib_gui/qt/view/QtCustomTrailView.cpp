@@ -243,7 +243,7 @@ QtCustomTrailView::QtCustomTrailView(ViewLayout* viewLayout)
 			Edge::EDGE_TYPE_ARGUMENT,
 			Edge::EDGE_INCLUDE,
 			Edge::EDGE_IMPORT,
-			// Edge::EDGE_AGGREGATION,
+			// Edge::EDGE_BUNDLED_EDGES,
 			Edge::EDGE_MACRO_USAGE,
 			Edge::EDGE_ANNOTATION_USAGE
 			// Edge::EDGE_MEMBER // has separate checkbox
@@ -443,9 +443,9 @@ void QtCustomTrailView::keyPressEvent(QKeyEvent* event)
 void QtCustomTrailView::updateStyleSheet()
 {
 	std::string css = utility::getStyleSheet(
-		ResourcePaths::getGuiPath().concatenate(L"search_view/search_view.css"));
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"search_view/search_view.css"));
 	css += utility::getStyleSheet(
-		ResourcePaths::getGuiPath().concatenate(L"custom_trail_view/custom_trail_view.css"));
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"custom_trail_view/custom_trail_view.css"));
 
 	setStyleSheet(css.c_str());
 
@@ -497,7 +497,7 @@ QVBoxLayout* QtCustomTrailView::addFilters(
 	mainLayout->addLayout(filterBLayout);
 
 	QPixmap pixmap(QString::fromStdString(
-		ResourcePaths::getGuiPath().concatenate(L"custom_trail_view/images/circle.png").str()));
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"custom_trail_view/images/circle.png").str()));
 	for (size_t i = 0; i < filters.size(); i++)
 	{
 		QCheckBox* checkBox = new QCheckBox(filters[i]);

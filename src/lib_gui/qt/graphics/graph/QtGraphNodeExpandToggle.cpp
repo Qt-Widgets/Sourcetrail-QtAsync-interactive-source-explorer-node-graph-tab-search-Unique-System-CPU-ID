@@ -25,7 +25,7 @@ QtGraphNodeExpandToggle::QtGraphNodeExpandToggle(bool expanded, int invisibleSub
 	m_icon->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
 
 	QtDeviceScaledPixmap pixmap(QString::fromStdWString(
-		ResourcePaths::getGuiPath().concatenate(L"graph_view/images/arrow.png").wstr()));
+		ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/arrow.png").wstr()));
 	pixmap.scaleToHeight(iconHeight);
 
 	if (invisibleSubNodeCount)
@@ -69,7 +69,7 @@ void QtGraphNodeExpandToggle::updateStyle()
 	setStyle(style);
 
 	float textX = static_cast<float>(
-		(m_rect->rect().width() / 2) - (QFontMetrics(m_text->font()).width(m_text->text()) / 2));
+		(m_rect->rect().width() / 2) - (QFontMetrics(m_text->font()).boundingRect(m_text->text()).width() / 2));
 	const float textY = static_cast<float>(
 		m_rect->rect().height() / 2 - QFontMetrics(m_text->font()).height() / 1.8f);
 
